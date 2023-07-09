@@ -126,10 +126,10 @@ always @(posedge clk or negedge rst_n)
         addr4  <= 'd0;    addr5 <= 'd0;    addr6 <= 'd0;
         done1  <= 'd1;    done2 <= 'd1;    done3 <= 'd1;
         done4  <= 'd1;    done5 <= 'd1;    done6 <= 'd1;
-        start1 <= 'd0;   start2 <= 'd0;   start3 <= 'd0;
-        start4 <= 'd0;   start5 <= 'd0;   start6 <= 'd0;
-        end1   <= 'd0;     end2 <= 'd0;     end3 <= 'd0;
-        end4   <= 'd0;     end5 <= 'd0;     end6 <= 'd0;
+        start1 <= 12'h0000;   start2 <= 12'h01c0;   start3 <= 12'h0440;
+        start4 <= 12'h1b80;   start5 <= 12'h1d00;   start6 <= 12'h1f80;
+        end1   <= 12'h01bf;     end2 <= 12'h043f;     end3 <= 12'h1b7f;
+        end4   <= 12'h1cff;     end5 <= 12'h1f7f;     end6 <= 12'h1fff;
         skip1  <= 'd0;    skip2 <= 'd0;    skip3 <= 'd0;
         skip4  <= 'd0;    skip5 <= 'd0;    skip6 <= 'd0;
     end else if( cen ) begin

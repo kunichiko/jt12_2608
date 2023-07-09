@@ -340,52 +340,19 @@ always @(posedge clk) begin : memory_mapped_registers
                     pcm_wr <= selected_register==REG_PCM;
                 end
                 if( use_adpcm==1 ) begin
-                    // YM2610 ADPCM-A support, A1=1, regs 0-2D
-                    if(part && selected_register[7:6]==2'b0) begin
-                        casez( selected_register[5:0] )
-                            6'h0: begin
+                    // use YM2610 ADPCM-A for YM2608 Rhythm (A1=0, regs 10-1D
+                    if(!part && selected_register[7:4]==4'h1) begin
+                        casez( selected_register[3:0] )
+                            4'h0: begin
                                 aon_a  <= din;
                                 up_aon <= 1'b1;
                             end
-                            6'h1: atl_a <= din[5:0];
+                            4'h1: atl_a <= din[5:0];
                             // LRACL
-                            6'h8, 6'h9, 6'hA, 6'hB, 6'hC, 6'hD: begin
+                            4'h8, 4'h9, 4'hA, 4'hB, 4'hC, 4'hD: begin
                                 lracl <= din;
                                 up_lracl <= selected_register[2:0];
                             end
-                            6'b01_????, 6'b10_????: begin
-                                if( !selected_register[3] ) addr_a[ 7:0] <= din;
-                                if( selected_register[3]  ) addr_a[15:8] <= din;
-                                case( selected_register[5:4] )
-                                    2'b01, 2'b10: begin
-                                        {up_end, up_start } <= selected_register[5:4];
-                                        up_addr <= selected_register[2:0];
-                                    end
-                                    default: begin
-                                        up_start <= 1'b0;
-                                        up_end   <= 1'b0;
-                                    end
-                                endcase
-                            end
-                            default:;
-                        endcase
-                    end
-                    if( !part && selected_register[7:4]==4'h1 ) begin
-                        // YM2610 ADPCM-B support, A1=0, regs 1x
-                        case(selected_register[3:0])
-                            4'd0: {acmd_up_b, acmd_on_b, acmd_rep_b,acmd_rst_b} <= {1'd1,din[7],din[4],din[0]};
-                            4'd1: alr_b  <= din[7:6];
-                            4'd2: astart_b [ 7:0] <= din;
-                            4'd3: astart_b [15:8] <= din;
-                            4'd4: aend_b   [ 7:0] <= din;
-                            4'd5: aend_b   [15:8] <= din;
-                            4'h9: adeltan_b[ 7:0] <= din;
-                            4'ha: adeltan_b[15:8] <= din;
-                            4'hb: aeg_b           <= din;
-                            4'hc: begin
-                               flag_mask   <= ~{din[7],din[5:0]};
-                               flag_ctl    <= {din[7],din[5:0]}; // this lasts a single clock cycle
-                           end
                             default:;
                         endcase
                     end
