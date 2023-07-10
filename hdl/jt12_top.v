@@ -260,10 +260,10 @@ if( use_adpcm==1 ) begin: gen_adpcm
         .cur_ch     ( cur_ch        ),
         .cur_op     ( cur_op        ),
         .alg        ( alg_I         ),
-        .adpcmA_l   ( adpcmA_l      ),
-        .adpcmA_r   ( adpcmA_r      ),
-        .adpcmB_l   ( adpcmB_l      ),
-        .adpcmB_r   ( adpcmB_r      ),
+        .adpcmA_l   ( 'd0           ), // ADPCMは外部でミックスする
+        .adpcmA_r   ( 'd0           ),
+        .adpcmB_l   ( 'd0           ),
+        .adpcmB_r   ( 'd0           ),
         // combined output
         .left       ( fm_snd_left   ),
         .right      ( fm_snd_right  )

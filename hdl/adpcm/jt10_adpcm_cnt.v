@@ -51,7 +51,7 @@ module jt10_adpcm_cnt(
 
 reg [20:0] addr1, addr2, addr3, addr4, addr5, addr6;
 reg [3:0] bank1, bank2, bank3, bank4, bank5, bank6;
-reg [11:0] start1, start2, start3, start4, start5, start6,
+reg [12:0] start1, start2, start3, start4, start5, start6,
            end1,   end2,   end3,   end4,   end5,   end6;
 reg on1, on2, on3, on4, on5, on6;
 reg done1, done2, done3, done4, done5, done6;
@@ -126,10 +126,12 @@ always @(posedge clk or negedge rst_n)
         addr4  <= 'd0;    addr5 <= 'd0;    addr6 <= 'd0;
         done1  <= 'd1;    done2 <= 'd1;    done3 <= 'd1;
         done4  <= 'd1;    done5 <= 'd1;    done6 <= 'd1;
-        start1 <= 12'h0000;   start2 <= 12'h01c0;   start3 <= 12'h0440;
-        start4 <= 12'h1b80;   start5 <= 12'h1d00;   start6 <= 12'h1f80;
-        end1   <= 12'h01bf;     end2 <= 12'h043f;     end3 <= 12'h1b7f;
-        end4   <= 12'h1cff;     end5 <= 12'h1f7f;     end6 <= 12'h1fff;
+        start1 <= 13'h0000;   start2 <= 13'h01c0;   start3 <= 13'h0440;
+        start4 <= 13'h1b80;   start5 <= 13'h1d00;   start6 <= 13'h1f80;
+        end1   <= 13'h01bf;     end2 <= 13'h043f;     end3 <= 13'h1b7f;
+        end4   <= 13'h1cff;     end5 <= 13'h1f7f;     end6 <= 13'h1fff;
+        bank1  <= 4'h0;   bank2 <= 4'h0;   bank3 <= 4'h0;
+        bank4  <= 4'h0;   bank5 <= 4'h0;   bank6 <= 4'h0;
         skip1  <= 'd0;    skip2 <= 'd0;    skip3 <= 'd0;
         skip4  <= 'd0;    skip5 <= 'd0;    skip6 <= 'd0;
     end else if( cen ) begin
@@ -137,9 +139,12 @@ always @(posedge clk or negedge rst_n)
         on2    <= aoff ? 1'b0 : (aon | (on1 && ~done1));
         clr2   <= aoff || aon || done1; // Each time a A-ON is sent the address counter restarts
         done2  <= done1;
-        start2 <=  (up_start && up1) ? addr_in[11:0] : start1;
-        end2   <=  (up_end   && up1) ? addr_in[11:0] : end1;
-        bank2  <=  (up_start && up1) ? addr_in[15:12] : bank1;
+        //start2 <=  (up_start && up1) ? addr_in[11:0] : start1;
+        //end2   <=  (up_end   && up1) ? addr_in[11:0] : end1;
+        //bank2  <=  (up_start && up1) ? addr_in[15:12] : bank1;
+        start2 <= start1;
+        end2   <= end1;
+        bank2  <= bank1;
         skip2  <= skip1;
 
         addr3  <= addr2; // clr2 ? {start2,9'd0} : addr2;
@@ -163,7 +168,7 @@ always @(posedge clk or negedge rst_n)
         addr5  <= addr4;
         on5    <= on4;
         clr5   <= clr4;
-        done5  <= ~on4 ? done4 : (addr4[20:9] == end4 && addr4[8:0]==~9'b0 && ~clr4);
+        done5  <= ~on4 ? done4 : (addr4[20:14]==8'b0 && addr4[13:1] == end4 && addr4[0] == 1'd1 && ~clr4);
         start5 <= start4;
         end5   <= end4;
         bank5  <= bank4;
@@ -179,7 +184,7 @@ always @(posedge clk or negedge rst_n)
         sumup6 <= sumup5;
         skip6  <= skip5;
 
-        addr1  <= (clr6 && on6) ? {start6,9'd0} : (sumup6 && ~skip6 ? addr6+21'd1 :addr6);
+        addr1  <= (clr6 && on6) ? {7'd0,start6,1'd0} : (sumup6 && ~skip6 ? addr6+21'd1 :addr6);
         on1    <= on6;
         done1  <= done6;
         start1 <= start6;
