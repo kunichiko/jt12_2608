@@ -71,7 +71,7 @@ assign clr      = clr1;
 assign decon    = decon1;
 
 // Two cycles early:  0            0             1            1             2            2             3            3             4            4             5            5
-wire active5 = (en_ch[1] && cur_ch[4]) || (en_ch[2] && cur_ch[5]) || (en_ch[2] && cur_ch[0]) || (en_ch[3] && cur_ch[1]) || (en_ch[4] && cur_ch[2]) || (en_ch[5] && cur_ch[3]);//{ cur_ch[3:0], cur_ch[5:4] } == en_ch;
+wire active5 = (en_ch[1] && cur_ch[4]) || (en_ch[2] && cur_ch[5]) || (en_ch[3] && cur_ch[0]) || (en_ch[4] && cur_ch[1]) || (en_ch[5] && cur_ch[2]) || (en_ch[0] && cur_ch[3]);//{ cur_ch[3:0], cur_ch[5:4] } == en_ch;
 wire sumup5  = on5 && !done5 && active5;
 reg  sumup6;
 
@@ -126,10 +126,14 @@ always @(posedge clk or negedge rst_n)
         addr4  <= 'd0;    addr5 <= 'd0;    addr6 <= 'd0;
         done1  <= 'd1;    done2 <= 'd1;    done3 <= 'd1;
         done4  <= 'd1;    done5 <= 'd1;    done6 <= 'd1;
-        start1 <= 13'h0000;   start2 <= 13'h01c0;   start3 <= 13'h0440;
-        start4 <= 13'h1b80;   start5 <= 13'h1d00;   start6 <= 13'h1f80;
-        end1   <= 13'h01bf;     end2 <= 13'h043f;     end3 <= 13'h1b7f;
-        end4   <= 13'h1cff;     end5 <= 13'h1f7f;     end6 <= 13'h1fff;
+        //start1 <= 13'h0000;   start2 <= 13'h01c0;   start3 <= 13'h0440;
+        //start4 <= 13'h1b80;   start5 <= 13'h1d00;   start6 <= 13'h1f80;
+        //end1   <= 13'h01bf;     end2 <= 13'h043f;     end3 <= 13'h1b7f;
+        //end4   <= 13'h1cff;     end5 <= 13'h1f7f;     end6 <= 13'h1fff;
+        start1 <= 13'h0000;   start2 <= 13'h1f80;   start3 <= 13'h1d00;
+        start4 <= 13'h1b80;   start5 <= 13'h0440;   start6 <= 13'h01c0;
+        end1   <= 13'h01bf;     end2 <= 13'h1fff;     end3 <= 13'h1f7f;
+        end4   <= 13'h1cff;     end5 <= 13'h1b7f;     end6 <= 13'h043f;
         bank1  <= 4'h0;   bank2 <= 4'h0;   bank3 <= 4'h0;
         bank4  <= 4'h0;   bank5 <= 4'h0;   bank6 <= 4'h0;
         skip1  <= 'd0;    skip2 <= 'd0;    skip3 <= 'd0;
