@@ -51,7 +51,7 @@ module jt10_adpcm_drvA(
 
     output signed [15:0]  pcm55_l,
     output signed [15:0]  pcm55_r,
-	 input   [5:0]   ch_enable
+	input   [5:0]   ch_enable
 );
 
 /* verilator tracing_on */
@@ -91,6 +91,7 @@ reg match; // high when cur_ch==en_ch, but calculated one clock cycle ahead
     // so it can be latched
 wire [5:0] cur_next = { cur_ch[4:0], cur_ch[5] };
 wire [5:0]  en_next = {  en_ch[0],  en_ch[5:1] };
+//wire [5:0]  en_next = {  en_ch[4:0, en_ch[5]] };
 
 always @(posedge clk or negedge rst_n) 
     if( !rst_n ) begin

@@ -62,6 +62,10 @@ reg roe_n1, decon1;
 reg clr1, clr2, clr3, clr4, clr5, clr6;
 reg skip1, skip2, skip3, skip4, skip5, skip6;
 
+reg half1, half2, half3, half4, half5, half6;
+reg [5:0] even_odd_counter;
+reg even_odd;
+
 // All outputs from stage 1
 assign addr_out = addr1[20:1];
 assign sel      = addr1[0];
@@ -72,7 +76,7 @@ assign decon    = decon1;
 
 // Two cycles early:  0            0             1            1             2            2             3            3             4            4             5            5
 wire active5 = (en_ch[1] && cur_ch[4]) || (en_ch[2] && cur_ch[5]) || (en_ch[3] && cur_ch[0]) || (en_ch[4] && cur_ch[1]) || (en_ch[5] && cur_ch[2]) || (en_ch[0] && cur_ch[3]);//{ cur_ch[3:0], cur_ch[5:4] } == en_ch;
-wire sumup5  = on5 && !done5 && active5;
+wire sumup5  = on5 && !done5 && active5 && (!half5 || half5 && even_odd);
 reg  sumup6;
 
 reg [5:0] last_done, set_flags;
@@ -138,7 +142,16 @@ always @(posedge clk or negedge rst_n)
         bank4  <= 4'h0;   bank5 <= 4'h0;   bank6 <= 4'h0;
         skip1  <= 'd0;    skip2 <= 'd0;    skip3 <= 'd0;
         skip4  <= 'd0;    skip5 <= 'd0;    skip6 <= 'd0;
+        half1  <= 'd0;    half2 <= 'd1;    half3 <= 'd1;
+        half4  <= 'd0;    half5 <= 'd0;    half6 <= 'd0;
+        //half1  <= 'd1;    half2 <= 'd1;    half3 <= 'd1;
+        //half4  <= 'd1;    half5 <= 'd1;    half6 <= 'd1;
+        even_odd <= 'd0;
+        even_odd_counter <= 'd0;
     end else if( cen ) begin
+        even_odd_counter <= even_odd_counter == 6'd35 ? 'd0 : even_odd_counter + 6'd1;
+        even_odd <= even_odd_counter == 6'd35 ? ~even_odd : even_odd;
+
         addr2  <= addr1;
         on2    <= aoff ? 1'b0 : (aon | (on1 && ~done1));
         clr2   <= aoff || aon || done1; // Each time a A-ON is sent the address counter restarts
@@ -150,6 +163,7 @@ always @(posedge clk or negedge rst_n)
         end2   <= end1;
         bank2  <= bank1;
         skip2  <= skip1;
+        half2  <= half1;
 
         addr3  <= addr2; // clr2 ? {start2,9'd0} : addr2;
         on3    <= on2;
@@ -159,6 +173,7 @@ always @(posedge clk or negedge rst_n)
         end3   <= end2;
         bank3  <= bank2;
         skip3  <= skip2;
+        half3  <= half2;
 
         addr4  <= addr3;
         on4    <= on3;
@@ -168,6 +183,7 @@ always @(posedge clk or negedge rst_n)
         end4   <= end3;
         bank4  <= bank3;
         skip4  <= skip3;
+        half4  <= half3;
 
         addr5  <= addr4;
         on5    <= on4;
@@ -177,6 +193,7 @@ always @(posedge clk or negedge rst_n)
         end5   <= end4;
         bank5  <= bank4;
         skip5  <= skip4;
+        half5  <= half4;
         // V
         addr6  <= addr5;
         on6    <= on5;
@@ -187,6 +204,7 @@ always @(posedge clk or negedge rst_n)
         bank6  <= bank5;
         sumup6 <= sumup5;
         skip6  <= skip5;
+        half6  <= half5;
 
         addr1  <= (clr6 && on6) ? {7'd0,start6,1'd0} : (sumup6 && ~skip6 ? addr6+21'd1 :addr6);
         on1    <= on6;
@@ -198,6 +216,7 @@ always @(posedge clk or negedge rst_n)
         bank1  <= bank6;
         clr1   <= clr6;
         skip1  <= (clr6 && on6) ? 1'b1 : sumup6 ? 1'b0 : skip6;
+        half1  <= half6;
     end
 
 endmodule // jt10_adpcm_cnt
