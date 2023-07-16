@@ -38,9 +38,21 @@ always @(posedge clk) begin
     casez( addr )
         2'b00: dout <= {busy, 5'd0, flag_B, flag_A }; // YM2203
         2'b01: dout <= (use_ssg  ==1) ? psg_dout : {busy, 5'd0, flag_B, flag_A };
-        2'b1?: dout <= (use_adpcm==1) ?
-            { adpcmb_flag, 1'b0, adpcma_flags } :
-            { busy, 5'd0, flag_B, flag_A };
+        // YM2610
+        //2'b1?: dout <= (use_adpcm==1) ?
+        //    { adpcmb_flag, 1'b0, adpcma_flags } :
+        //    { busy, 5'd0, flag_B, flag_A }; 
+
+        // YM2608
+        // D7 : busy
+        // D6 : 0
+        // D5 : ADPCM BUSY
+        // D4 : ADPCM ZERO
+        // D3 : ADPCM BRDY
+        // D2 : ADPCM EOS
+        // D1 : Flag B
+        // D0 : Flag A
+        2'b1?: dout <= { busy, 5'd0, flag_B, flag_A };
     endcase
 end
 

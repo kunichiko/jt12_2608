@@ -79,7 +79,7 @@ reg acc_en_l, acc_en_r;
 // reference: YM2610 Application Notes.
 always @(*)
     case( {cur_op,cur_ch} )
-        {2'd0,3'd0}: begin // ADPCM-A:
+/*         {2'd0,3'd0}: begin // ADPCM-A:
             acc_input_l = (adpcmA_l <<< 2) + (adpcmA_l <<< 1);
             acc_input_r = (adpcmA_r <<< 2) + (adpcmA_r <<< 1);
             `ifndef NOMIX
@@ -101,7 +101,8 @@ always @(*)
             acc_en_r    = 1'b0;
             `endif
         end
-        default: begin
+ */
+         default: begin
             // Note by Jose Tejada:
             // I don't think we should divide down the FM output
             // but someone was looking at the balance of the different
