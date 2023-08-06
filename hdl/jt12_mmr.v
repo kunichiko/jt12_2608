@@ -184,6 +184,14 @@ reg [1:0] up_op;
 reg old_write;
 reg [7:0] din_copy;
 
+reg irq_mask_timerA, irq_mask_timerB;
+reg irq_enable_timerA, irq_enable_timerB;
+
+always @(posedge clk) begin
+    enable_irq_A <= irq_enable_timerA && irq_mask_timerA;
+    enable_irq_B <= irq_enable_timerB && irq_mask_timerB;
+end
+
 always @(posedge clk)
     old_write <= write;
 
@@ -224,7 +232,8 @@ always @(posedge clk) begin : memory_mapped_registers
         // timers
         { value_A, value_B } <= 0;
         { clr_flag_B, clr_flag_A,
-        enable_irq_B, enable_irq_A, load_B, load_A } <= 0;
+        irq_enable_timerA, irq_enable_timerB, load_B, load_A } <= 0;
+        {irq_mask_timerA, irq_mask_timerB} <= 0;
         fast_timers <= 0;
         // LFO
         lfo_freq    <= 0;
@@ -303,11 +312,15 @@ always @(posedge clk) begin : memory_mapped_registers
                         REG_CLKA1:  value_A[9:2]<= din;
                         REG_CLKA2:  value_A[1:0]<= din[1:0];
                         REG_CLKB:   value_B     <= din;
+                        REG_IRQMASK: begin
+                            irq_mask_timerA <= din[0];
+                            irq_mask_timerB <= din[1];
+                            end
                         REG_TIMER: begin
                             effect  <= |din[7:6];
                             csm     <= din[7:6] == 2'b10;
                             { clr_flag_B, clr_flag_A,
-                              enable_irq_B, enable_irq_A,
+                              irq_enable_timerB, irq_enable_timerA,
                               load_B, load_A } <= din[5:0];
                             end
                         `ifndef NOLFO                   
